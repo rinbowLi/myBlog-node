@@ -12,7 +12,13 @@ let articleSchema = mongoose.Schema({
   },
   time: Date,
   catalog: String,  //文章分类
-  tags:String       //文章标签
+  tags:String,       //文章标签
+  isTop:Number,  //1-置顶 0-普通
+  commentCount:Number,  //评论数
+  viewsCount:Number,      //阅读次数
+  allowComment:Number, //1-允许 0-不允许
+  updateTime: Date,
+
 })
 
 

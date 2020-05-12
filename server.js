@@ -4,6 +4,7 @@ const path = require("path")
 const userRouter = require("./router/userRouter")
 const articleRouter = require("./router/articleRouter")
 const fileRouter = require("./router/fileRouter")
+const commentRouter = require("./router/commentsRouter")
 
 const app = express()
 const bodyParser = require("body-parser")
@@ -28,6 +29,7 @@ app.all('*', function (req, res, next) {
 app.use("/user", userRouter)
 app.use("/article", articleRouter)
 app.use("/file", fileRouter)
+app.use("/comment", commentRouter)
 
 app.listen("3000", (req, res) => {
   console.log("服务开启了")

@@ -103,9 +103,9 @@ router.post("/login", (req, res) => {
         console.log(result);
         if (result.length > 0) {
           //登陆成功后将用户信息保存到session中
-          req.session.login=true;
-          req.session.username = username
-          console.log(req.session)
+          // req.session.login=true;
+          // req.session.username = username
+         // console.log(req.session)
           res.send({
             code: 0,
             msg: "登录成功"
