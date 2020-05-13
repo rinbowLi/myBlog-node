@@ -262,9 +262,87 @@ router.post("/selectArticleBykeyword", (req, res) => {
  */
 router.post("/selectArticleByPage", (req, res) => {
   //数据获取
-  let pageSize =req.body.pageSize || 10;
-  let page =req.body.page || 1;
-  article.find().limit(Number(pageSize)).skip(Number(pageSize*(page-1))) //文章标题和内容模糊查询
+  let pageSize = req.body.pageSize || 10;
+  let page = req.body.page || 1;
+  article.find().limit(Number(pageSize)).skip(Number(pageSize * (page - 1))) //文章标题和内容模糊查询
+    .then(result => {
+      console.log(result)
+      return res.send({
+        code: 0,
+        msg: "文章查询成功",
+        data: result
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      return res.send({
+        code: -1,
+        msg: "系统错误"
+      });
+    })
+})
+
+
+/**
+ * @api {post} /article/getArticleCount 分页查询文章接口
+ * @apiName getArticleCount
+ * @apiGroup article
+ *
+ *
+ * @apiSuccess {Number} code 返回状态码.
+ * @apiSuccess {String} msg  返回消息.
+ * @apiSuccess {Array} data  返回数据.
+ */
+router.post("/getArticleCount", (req, res) => {
+  let catalog = req.body.catalog;
+  let query;
+  !catalog ? query = {} : query = {
+    catalog
+  }
+  article.count(query)
+    .then(result => {
+      console.log(result)
+      return res.send({
+        code: 0,
+        msg: "文章数量查询成功",
+        data: result
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      return res.send({
+        code: -1,
+        msg: "系统错误"
+      });
+    })
+})
+
+/**
+ * @api {post} /article/selectArticleByCatalog 分页查询文章接口
+ * @apiName selectArticleByCatalog
+ * @apiGroup article
+ *
+ * @apiParam {Number} pageSize 每一页的数量
+ * @apiParam {Number} page 当前第几页
+ *
+ * @apiSuccess {Number} code 返回状态码.
+ * @apiSuccess {String} msg  返回消息.
+ * @apiSuccess {Array} data  返回数据.
+ */
+router.post("/selectArticleByCatalog", (req, res) => {
+  //数据获取
+  let pageSize = req.body.pageSize || 10;
+  let page = req.body.page || 1;
+  let catalog = req.body.catalog
+  if (!catalog) {
+    return res.send({
+      code: -1,
+      msg: "请填写分类名"
+    });
+  }
+  article.find({
+      catalog
+    }).limit(Number(pageSize)).skip(Number(pageSize * (page - 1))) //文章标题和内容模糊查询
     .then(result => {
       console.log(result)
       return res.send({
