@@ -39,14 +39,12 @@ router.post("/addArticle", (req, res) => {
       tags
     })
     .then(result => {
-      console.log(result)
       return res.send({
         code: 0,
         msg: "文章提交成功"
       });
     })
     .catch(err => {
-      console.log(err);
       return res.send({
         code: -1,
         msg: "系统错误"
@@ -79,14 +77,12 @@ router.post("/delArticle", (req, res) => {
       _id: id
     })
     .then(result => {
-      console.log(result)
       return res.send({
         code: 0,
         msg: "文章删除成功"
       });
     })
     .catch(err => {
-      console.log(err);
       return res.send({
         code: -1,
         msg: "系统错误"
@@ -138,14 +134,12 @@ router.post("/updateArticle", (req, res) => {
       time: new Date().getTime(),
     })
     .then(result => {
-      console.log(result)
       return res.send({
         code: 0,
         msg: "文章修改成功"
       });
     })
     .catch(err => {
-      console.log(err);
       return res.send({
         code: -1,
         msg: "系统错误"
@@ -179,7 +173,6 @@ router.post("/selectArticleById", (req, res) => {
       _id: id
     })
     .then(result => {
-      console.log(result)
       return res.send({
         code: 0,
         msg: "文章查询成功",
@@ -187,7 +180,6 @@ router.post("/selectArticleById", (req, res) => {
       });
     })
     .catch(err => {
-      console.log(err);
       return res.send({
         code: -1,
         msg: "系统错误"
@@ -231,7 +223,6 @@ router.post("/selectArticleBykeyword", (req, res) => {
       }]
     }) //文章标题和内容模糊查询
     .then(result => {
-      console.log(result)
       return res.send({
         code: 0,
         msg: "文章查询成功",
@@ -239,7 +230,6 @@ router.post("/selectArticleBykeyword", (req, res) => {
       });
     })
     .catch(err => {
-      console.log(err);
       return res.send({
         code: -1,
         msg: "系统错误"
@@ -264,9 +254,8 @@ router.post("/selectArticleByPage", (req, res) => {
   //数据获取
   let pageSize = req.body.pageSize || 10;
   let page = req.body.page || 1;
-  article.find().limit(Number(pageSize)).skip(Number(pageSize * (page - 1))) //文章标题和内容模糊查询
+  article.find().limit(Number(pageSize)).skip(Number(pageSize * (page - 1))).sort({time:-1}) //文章标题和内容模糊查询
     .then(result => {
-      console.log(result)
       return res.send({
         code: 0,
         msg: "文章查询成功",
@@ -274,7 +263,6 @@ router.post("/selectArticleByPage", (req, res) => {
       });
     })
     .catch(err => {
-      console.log(err);
       return res.send({
         code: -1,
         msg: "系统错误"
@@ -301,7 +289,6 @@ router.post("/getArticleCount", (req, res) => {
   }
   article.count(query)
     .then(result => {
-      console.log(result)
       return res.send({
         code: 0,
         msg: "文章数量查询成功",
@@ -309,7 +296,6 @@ router.post("/getArticleCount", (req, res) => {
       });
     })
     .catch(err => {
-      console.log(err);
       return res.send({
         code: -1,
         msg: "系统错误"
@@ -342,9 +328,8 @@ router.post("/selectArticleByCatalog", (req, res) => {
   }
   article.find({
       catalog
-    }).limit(Number(pageSize)).skip(Number(pageSize * (page - 1))) //文章标题和内容模糊查询
+    }).limit(Number(pageSize)).skip(Number(pageSize * (page - 1))).sort({time:-1})//文章标题和内容模糊查询
     .then(result => {
-      console.log(result)
       return res.send({
         code: 0,
         msg: "文章查询成功",
@@ -352,7 +337,6 @@ router.post("/selectArticleByCatalog", (req, res) => {
       });
     })
     .catch(err => {
-      console.log(err);
       return res.send({
         code: -1,
         msg: "系统错误"

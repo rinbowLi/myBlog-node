@@ -2,6 +2,7 @@ const express = require("express")
 
 const router = express.Router()
 const comments = require("../model/commentsModel")
+const article = require("../model/articleModel")
 
 
 /**
@@ -21,29 +22,45 @@ router.post("/addComments", (req, res) => {
   let {
     name,
     content,
-    relatedArticleId
+    relatedArticleId,
+    parent
   } = req.body;
-  if (!title || !content) {
+  if (!name || !content) {
     return res.send({
       code: -1,
       msg: "请填写评论人和评论内容"
     });
   }
   comments.insertMany({
-    name,
+      name,
       content,
       relatedArticleId,
+      parent: parent || 0,
       createTime: new Date().getTime()
     })
     .then(result => {
-      console.log(result)
-      return res.send({
-        code: 0,
-        msg: "评论提交成功"
-      });
+      //评论成功后，该文章的commentCount自增1
+      article.findOneAndUpdate({
+        _id: relatedArticleId
+      }, {
+        $inc: {
+          commentCount: 1
+        }
+      }, (err) => {
+        if (!err) {
+          return res.send({
+            code: 0,
+            msg: "评论提交成功"
+          });
+        } else {
+          return res.send({
+            code: -1,
+            msg: "系统错误"
+          });
+        }
+      })
     })
     .catch(err => {
-      console.log(err);
       return res.send({
         code: -1,
         msg: "系统错误"
@@ -76,14 +93,12 @@ router.post("/delComments", (req, res) => {
       _id: id
     })
     .then(result => {
-      console.log(result)
       return res.send({
         code: 0,
         msg: "评论删除成功"
       });
     })
     .catch(err => {
-      console.log(err);
       return res.send({
         code: -1,
         msg: "系统错误"
@@ -113,19 +128,47 @@ router.post("/selectCommentsById", (req, res) => {
       msg: "请填写文章id"
     });
   }
-  comments.findById({
-      _id: id
+  //lean 方法返回的数据才可以修改，否则修改不生效
+  // sort {xxx:-1}  以xxx为倒序排列
+  comments.find({
+      relatedArticleId: id,
+      parent: 0
+    }).lean().sort({
+      createTime: -1
     })
     .then(result => {
-      console.log(result)
-      return res.send({
-        code: 0,
-        msg: "文章查询成功",
-        data: result
-      });
+      if (result.length > 0) {
+        result.map((v, i) => {
+          v.children = []
+          comments.find({
+            parent: v.id
+          }).lean().then(ret => {
+            ret.map(item => {
+              if (v.id === item.parent) {
+                item.reply = v.name;
+                v.children.push(item)
+              }
+            })
+            if (i === result.length - 1) {
+              console.log(result)
+              return res.send({
+                code: 0,
+                msg: "评论查询成功",
+                data: result
+              });
+            }
+          })
+        })
+      } else {
+        return res.send({
+          code: 0,
+          msg: "评论查询成功",
+          data: result
+        });
+      }
     })
     .catch(err => {
-      console.log(err);
+      console.log(err)
       return res.send({
         code: -1,
         msg: "系统错误"

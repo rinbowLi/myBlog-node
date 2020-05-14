@@ -1,7 +1,11 @@
 const mongoose = require("mongoose")
 
+let counter = 1;
+let CountedId = {type: Number, default: () => counter++};
+
 //3.创建Schema对象
 let commentsSchema = mongoose.Schema({
+  id: CountedId,
   name: {   //评论人
     type: String,
     required: true
@@ -11,7 +15,8 @@ let commentsSchema = mongoose.Schema({
     required: true
   },
   createTime: Date,
-  relatedArticleId:String  //关联文章id
+  relatedArticleId:String,  //关联文章id
+  parent:Number    //关联评论id   0--不关联评论 其他为关联评论的id
 })
 
 
@@ -19,3 +24,9 @@ let commentsSchema = mongoose.Schema({
 let commentsModel = mongoose.model("comments", commentsSchema);
 
 module.exports = commentsModel
+
+commentsModel.find({ id: { $gt: 0 } }).sort({ id: -1 })
+    .then(([first, ...others]) => {
+        if (first)
+            counter = first.id + 1;
+    });
