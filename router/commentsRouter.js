@@ -23,7 +23,8 @@ router.post("/addComments", (req, res) => {
     name,
     content,
     relatedArticleId,
-    parent
+    parent,
+    reply
   } = req.body;
   if (!name || !content) {
     return res.send({
@@ -36,6 +37,7 @@ router.post("/addComments", (req, res) => {
       content,
       relatedArticleId,
       parent: parent || 0,
+      reply: reply || "",
       createTime: new Date().getTime()
     })
     .then(result => {
@@ -145,7 +147,6 @@ router.post("/selectCommentsById", (req, res) => {
           }).lean().then(ret => {
             ret.map(item => {
               if (v.id === item.parent) {
-                item.reply = v.name;
                 v.children.push(item)
               }
             })
@@ -175,6 +176,5 @@ router.post("/selectCommentsById", (req, res) => {
       });
     })
 })
-
 
 module.exports = router;

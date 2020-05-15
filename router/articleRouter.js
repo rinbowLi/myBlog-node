@@ -223,6 +223,7 @@ router.post("/selectArticleBykeyword", (req, res) => {
       }]
     }) //文章标题和内容模糊查询
     .then(result => {
+      console.log(result)
       return res.send({
         code: 0,
         msg: "文章查询成功",
@@ -254,7 +255,9 @@ router.post("/selectArticleByPage", (req, res) => {
   //数据获取
   let pageSize = req.body.pageSize || 10;
   let page = req.body.page || 1;
-  article.find().limit(Number(pageSize)).skip(Number(pageSize * (page - 1))).sort({time:-1}) //文章标题和内容模糊查询
+  article.find().limit(Number(pageSize)).skip(Number(pageSize * (page - 1))).sort({
+      time: -1
+    }) //文章标题和内容模糊查询
     .then(result => {
       return res.send({
         code: 0,
@@ -287,7 +290,7 @@ router.post("/getArticleCount", (req, res) => {
   !catalog ? query = {} : query = {
     catalog
   }
-  article.count(query)
+  article.countDocuments(query)
     .then(result => {
       return res.send({
         code: 0,
@@ -328,12 +331,49 @@ router.post("/selectArticleByCatalog", (req, res) => {
   }
   article.find({
       catalog
-    }).limit(Number(pageSize)).skip(Number(pageSize * (page - 1))).sort({time:-1})//文章标题和内容模糊查询
+    }).limit(Number(pageSize)).skip(Number(pageSize * (page - 1))).sort({
+      time: -1
+    }) //文章标题和内容模糊查询
     .then(result => {
       return res.send({
         code: 0,
         msg: "文章查询成功",
         data: result
+      });
+    })
+    .catch(err => {
+      return res.send({
+        code: -1,
+        msg: "系统错误"
+      });
+    })
+})
+
+/**
+ * @api {post} /article/selectNextAndPrevArticle 查询上一篇和下一篇文章
+ * @apiName selectArticleByCatalog
+ * @apiGroup article
+ *
+ * @apiParam {Number} id 文章id
+
+ *
+ * @apiSuccess {Number} code 返回状态码.
+ * @apiSuccess {String} msg  返回消息.
+ * @apiSuccess {Array} data  返回数据.
+ */
+router.post("/selectNextAndPrevArticle", (req, res) => {
+  //数据获取
+  let id = Number(req.body.id) || 1;
+  article.where('id').in([id - 1, id + 1])
+    .then(result => {
+      console.log(result)
+      let ret = {};
+      ret.prev = result.filter(v => v.id === id - 1);
+      ret.next = result.filter(v => v.id === id + 1);
+      return res.send({
+        code: 0,
+        msg: "上下文章查询成功",
+        data: ret
       });
     })
     .catch(err => {

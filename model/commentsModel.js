@@ -16,7 +16,8 @@ let commentsSchema = mongoose.Schema({
   },
   createTime: Date,
   relatedArticleId:String,  //关联文章id
-  parent:Number    //关联评论id   0--不关联评论 其他为关联评论的id
+  parent:Number,    //关联顶层评论id   0--不关联评论 其他为关联评论的id
+  reply:String     //回复对象 为空则为文章顶层评论
 })
 
 
