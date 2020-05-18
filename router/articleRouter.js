@@ -4,6 +4,8 @@ const router = express.Router()
 const article = require("../model/articleModel")
 
 
+let views = {}; //声明全局变量保存访问信息到内存中
+
 /**
  * @api {post} /article/addArticle 添加文章接口
  * @apiName addArticle
@@ -23,7 +25,9 @@ router.post("/addArticle", (req, res) => {
     title,
     content,
     catalog,
-    tags
+    tags,
+    isTop,
+    allowComment
   } = req.body;
   if (!title || !content) {
     return res.send({
@@ -36,7 +40,9 @@ router.post("/addArticle", (req, res) => {
       content,
       catalog,
       time: new Date().getTime(),
-      tags
+      tags,
+      isTop,
+      allowComment
     })
     .then(result => {
       return res.send({
@@ -163,28 +169,52 @@ router.post("/selectArticleById", (req, res) => {
   let {
     id
   } = req.body;
+  console.log(req.ip)
   if (!id) {
     return res.send({
       code: -1,
       msg: "请填写文章id"
     });
   }
-  article.findById({
+  if (views[req.ip] && (new Date().getTime() - views[req.ip].createTime) < 1000 * 60 * 10) {
+    article.findById({
+        _id: id
+      })
+      .then(result => {
+        return res.send({
+          code: 0,
+          msg: "文章查询成功",
+          data: result
+        });
+
+      })
+      .catch(err => {
+        return res.send({
+          code: -1,
+          msg: "系统错误"
+        });
+      })
+
+  } else {
+    //在内存中保存访问ip和创建时间，以便记录访问量
+    views[req.ip] = {
+      createTime: new Date().getTime()
+    }
+    article.findByIdAndUpdate({
       _id: id
-    })
-    .then(result => {
+    }, {
+      $inc: {
+        viewsCount: 1
+      }
+    }).then(result => {
       return res.send({
         code: 0,
         msg: "文章查询成功",
         data: result
       });
     })
-    .catch(err => {
-      return res.send({
-        code: -1,
-        msg: "系统错误"
-      });
-    })
+
+  }
 })
 
 /**
@@ -223,7 +253,6 @@ router.post("/selectArticleBykeyword", (req, res) => {
       }]
     }) //文章标题和内容模糊查询
     .then(result => {
-      console.log(result)
       return res.send({
         code: 0,
         msg: "文章查询成功",
@@ -366,7 +395,6 @@ router.post("/selectNextAndPrevArticle", (req, res) => {
   let id = Number(req.body.id) || 1;
   article.where('id').in([id - 1, id + 1])
     .then(result => {
-      console.log(result)
       let ret = {};
       ret.prev = result.filter(v => v.id === id - 1);
       ret.next = result.filter(v => v.id === id + 1);
