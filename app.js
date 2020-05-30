@@ -7,6 +7,7 @@ const fileRouter = require("./router/fileRouter")
 const commentRouter = require("./router/commentsRouter")
 const timelineRouter = require("./router/timelineRouter")
 const messageRouter = require("./router/messageRouter")
+const linkRouter = require("./router/linkRouter")
 
 const app = express()
 const bodyParser = require("body-parser")
@@ -55,6 +56,7 @@ app.use("/file", fileRouter)
 app.use("/comment", commentRouter)
 app.use("/timeline", timelineRouter)
 app.use("/message", messageRouter)
+app.use("/link", linkRouter)
 
 app.get('/captcha', function (req, res) {
   var codeConfig = {
