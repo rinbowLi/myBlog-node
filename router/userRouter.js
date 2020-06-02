@@ -4,6 +4,9 @@ const router = express.Router()
 const user = require("../model/userModel")
 const email = require("../utils/mail")
 
+const jwt = require('jsonwebtoken');
+const token = require("../utils/token")
+
 let codes = {} //声明全局变量保存验证码到内存中
 
 /**
@@ -34,7 +37,7 @@ router.post("/register", (req, res) => {
       msg: "请输入用户名、密码和验证码"
     })
   } else {
-    if (codes[mail].randomCode!= code) {
+    if (codes[mail].randomCode != code) {
       return res.send({
         code: -1,
         msg: "验证码错误"
@@ -99,17 +102,20 @@ router.post("/login", (req, res) => {
         username,
         password
       })
-      .then(result => {
-        console.log(result);
+      .then((result) => {
         if (result.length > 0) {
           //登陆成功后将用户信息保存到session中
           // req.session.login=true;
           // req.session.username = username
-         // console.log(req.session)
-          res.send({
-            code: 0,
-            msg: "登录成功"
+          // console.log(req.session)
+          token.setToken(username).then(res1 => {
+            res.send({
+              code: 0,
+              msg: "登录成功",
+              result: res1
+            })
           })
+
         } else {
           res.send({
             code: -1,
@@ -156,7 +162,7 @@ router.post("/getMailCode", (req, res) => {
     })
   }
   let randomCode = parseInt(Math.random() * 100000);
-    //不足6位数时用0补齐
+  //不足6位数时用0补齐
   randomCode = randomCode.toString().padStart(6, "0")
 
   email.sendMail(mail, "邮箱注册邮件", randomCode)
