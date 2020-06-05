@@ -10,8 +10,8 @@ function setToken(username) {
     }, signkey, {
       expiresIn: 60 * 60 * 24 * 3
     });
-    let info = jwt.verify(token.split(' ')[1], signkey)
-    console.log(info);
+    // let info = jwt.verify(token.split(' ')[1], signkey)
+    // console.log(info);
     console.log('token', token);
     resolve(token);
   })

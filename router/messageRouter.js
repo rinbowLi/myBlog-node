@@ -112,4 +112,43 @@ router.post("/getMessageCount", (req, res) => {
     })
 })
 
+
+/**
+ * @api {post} /message/delMessage 删除留言接口
+ * @apiName delMessage
+ * @apiGroup message
+ *
+ * @apiParam {String} id 留言唯一id.
+ *
+ * @apiSuccess {Number} code 返回状态码.
+ * @apiSuccess {String} msg  返回消息.
+ */
+router.post("/delMessage", (req, res) => {
+  //数据获取
+  let {
+    id
+  } = req.body;
+  if (!id) {
+    return res.send({
+      code: -1,
+      msg: "请填写留言id"
+    });
+  }
+  message.deleteOne({
+      _id: id
+    })
+    .then(result => {
+      return res.send({
+        code: 0,
+        msg: "留言删除成功"
+      });
+    })
+    .catch(err => {
+      return res.send({
+        code: -1,
+        msg: "系统错误"
+      });
+    })
+})
+
 module.exports = router;

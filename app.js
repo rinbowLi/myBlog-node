@@ -33,15 +33,30 @@ app.use(function (req, res, next) {
   }
 });
 
+app.use(function (err, req, res, next) {
+  console.log(err);
+  if (err.name === 'UnauthorizedError') {
+    console.error(req.path + ',无效token');
+    res.send({
+      message: 'token过期，请重新登录',
+      code: 401
+    })
+    return
+  }
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
 
 //不需要token验证的接口数组
-const DonotNeedTokenArr = ['/', '/user/login', '/article/selectArticleById', '/article/selectArticleBykeyword', '/article/selectArticleByPage', '/article/getArticleCount', '/article/selectArticleByCatalog', '/article/selectNextAndPrevArticle', '/comment/selectCommentsById', '/link/selectLink', '/message/selectMessageByPage', '/message/getMessageCount', '/timeline/selectTimeline']
+const DonotNeedTokenArr = ['/', '/captcha', '/user/login', '/article/selectArticleById', '/article/selectArticleBykeyword', '/article/selectArticleByPage', '/article/getArticleCount', '/article/selectArticleByCatalog', '/article/selectNextAndPrevArticle', '/comment/selectCommentsById', '/link/selectLink','/message/addmessage', '/message/selectMessageByPage', '/message/getMessageCount', '/timeline/selectTimeline']
 
 //验证token是否过期并规定哪些路由不用验证
 app.use(expressJwt({
   secret: 'myblog_rinbowli'
 }).unless({
-  path: DonotNeedTokenArr //除了这个地址，其他的URL都需要验证
+  path: DonotNeedTokenArr //除了这些地址，其他的URL都需要验证
 }));
 
 app.use(session({
@@ -69,7 +84,7 @@ app.use("/public", express.static(path.join(__dirname, "./uploads")))
 app.all('*', function (req, res, next) {
   res.header("Access-Control-Allow-Credentials", true)
   // 第二个参数表示允许跨域的域名，* 代表所有域名  
-  res.header('Access-Control-Allow-Origin', 'http://localhost:8081')
+  res.header('Access-Control-Allow-Origin', 'http://localhost:8080')
   res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, OPTIONS') // 允许的 http 请求的方法
   // 允许前台获得的除 Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma 这几张基本响应头之外的响应头
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With')

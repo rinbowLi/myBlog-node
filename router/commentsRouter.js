@@ -6,13 +6,13 @@ const article = require("../model/articleModel")
 
 
 /**
- * @api {post} /comments/addcomments 添加文章接口
+ * @api {post} /comments/addcomments 添加评论接口
  * @apiName addcomments
  * @apiGroup comments
  *
  * @apiParam {String} name 评论人.
  * @apiParam {String} content 评论内容.
- * @apiParam {String} relatedArticleId 关联文章id.
+ * @apiParam {String} relatedArticleId 关联评论id.
  *
  * @apiSuccess {Number} code 返回状态码.
  * @apiSuccess {String} msg  返回消息.
@@ -41,7 +41,7 @@ router.post("/addComments", (req, res) => {
       createTime: new Date().getTime()
     })
     .then(result => {
-      //评论成功后，该文章的commentCount自增1
+      //评论成功后，该评论的commentCount自增1
       article.findOneAndUpdate({
         _id: relatedArticleId
       }, {
@@ -109,11 +109,11 @@ router.post("/delComments", (req, res) => {
 })
 
 /**
- * @api {post} /comments/selectCommentsById 精准查询文章接口
+ * @api {post} /comments/selectCommentsById 精准查询评论接口
  * @apiName selectCommentsById
  * @apiGroup comments
  *
- * @apiParam {String} id 文章唯一id.
+ * @apiParam {String} id 评论唯一id.
  *
  * @apiSuccess {Number} code 返回状态码.
  * @apiSuccess {String} msg  返回消息.
@@ -127,7 +127,7 @@ router.post("/selectCommentsById", (req, res) => {
   if (!id) {
     return res.send({
       code: -1,
-      msg: "请填写文章id"
+      msg: "请填写评论id"
     });
   }
   //lean 方法返回的数据才可以修改，否则修改不生效
@@ -170,6 +170,45 @@ router.post("/selectCommentsById", (req, res) => {
     })
     .catch(err => {
       console.log(err)
+      return res.send({
+        code: -1,
+        msg: "系统错误"
+      });
+    })
+})
+
+/**
+ * @api {post} /comment/selectCommentsByPage 分页查询评论接口
+ * @apiName selectCommentsByPage
+ * @apiGroup comment
+ *
+ * @apiParam {Number} pageSize 每一页的数量
+ * @apiParam {Number} page 当前第几页
+ *
+ * @apiSuccess {Number} code 返回状态码.
+ * @apiSuccess {String} msg  返回消息.
+ * @apiSuccess {Array} data  返回数据.
+ */
+router.post("/selectCommentsByPage", (req, res) => {
+  //数据获取
+  let pageSize = req.body.pageSize || 10;
+  let page = req.body.page || 1;
+  comments.find().limit(Number(pageSize)).skip(Number(pageSize * (page - 1))).sort({
+      time: -1
+    }) //评论标题和内容模糊查询
+    .then(result => {
+      comments.countDocuments().then(
+        res1 => {
+          return res.send({
+            code: 0,
+            msg: "评论查询成功",
+            data: result,
+            total:res1   
+          });
+        })
+   
+    })
+    .catch(err => {
       return res.send({
         code: -1,
         msg: "系统错误"

@@ -42,7 +42,9 @@ router.post("/addArticle", (req, res) => {
       time: new Date().getTime(),
       tags,
       isTop,
-      allowComment
+      allowComment,
+      commentCount: 0,
+      viewsCount: 0
     })
     .then(result => {
       return res.send({
@@ -117,7 +119,9 @@ router.post("/updateArticle", (req, res) => {
     title,
     content,
     catalog,
-    tags
+    tags,
+    isTop,
+    allowComment
   } = req.body;
   if (!id) {
     return res.send({
@@ -131,13 +135,16 @@ router.post("/updateArticle", (req, res) => {
       msg: "请填写文章标题和文章内容"
     });
   }
-  article.updateOne({
-      _id: id,
+  article.update({
+      _id: id
+    }, {
       title,
       content,
       catalog,
       tags,
-      time: new Date().getTime(),
+      isTop,
+      allowComment,
+      updateTime: new Date().getTime(),
     })
     .then(result => {
       return res.send({
@@ -146,6 +153,7 @@ router.post("/updateArticle", (req, res) => {
       });
     })
     .catch(err => {
+      console.log(err)
       return res.send({
         code: -1,
         msg: "系统错误"
