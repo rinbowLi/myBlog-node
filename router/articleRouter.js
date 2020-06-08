@@ -177,52 +177,25 @@ router.post("/selectArticleById", (req, res) => {
   let {
     id
   } = req.body;
-  console.log(req.ip)
   if (!id) {
     return res.send({
       code: -1,
       msg: "请填写文章id"
     });
   }
-  if (views[req.ip] && (new Date().getTime() - views[req.ip].createTime) < 1000 * 60 * 10) {
-    article.findById({
-        _id: id
-      })
-      .then(result => {
-        return res.send({
-          code: 0,
-          msg: "文章查询成功",
-          data: result
-        });
-
-      })
-      .catch(err => {
-        return res.send({
-          code: -1,
-          msg: "系统错误"
-        });
-      })
-
-  } else {
-    //在内存中保存访问ip和创建时间，以便记录访问量
-    views[req.ip] = {
-      createTime: new Date().getTime()
+  article.findByIdAndUpdate({
+    _id: id
+  }, {
+    $inc: {
+      viewsCount: 1
     }
-    article.findByIdAndUpdate({
-      _id: id
-    }, {
-      $inc: {
-        viewsCount: 1
-      }
-    }).then(result => {
-      return res.send({
-        code: 0,
-        msg: "文章查询成功",
-        data: result
-      });
-    })
-
-  }
+  }).then(result => {
+    return res.send({
+      code: 0,
+      msg: "文章查询成功",
+      data: result
+    });
+  })
 })
 
 /**
