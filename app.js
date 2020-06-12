@@ -8,6 +8,7 @@ const commentRouter = require("./router/commentsRouter")
 const timelineRouter = require("./router/timelineRouter")
 const messageRouter = require("./router/messageRouter")
 const linkRouter = require("./router/linkRouter")
+const imageRouter = require("./router/imageRouter")
 
 const app = express()
 const bodyParser = require("body-parser")
@@ -16,6 +17,10 @@ const session = require("express-session")
 
 const expressJwt = require('express-jwt');
 const _token = require('./utils/token');
+
+//写在jwt前面就可以不用验证token
+app.use("/public", express.static(path.join(__dirname, "./uploads")))
+
 // 解析token获取用户信息
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
@@ -50,7 +55,7 @@ app.use(function (err, req, res, next) {
 
 
 //不需要token验证的接口数组
-const DonotNeedTokenArr = ['/', '/captcha', '/user/login', '/article/selectArticleById', '/article/selectArticleBykeyword', '/article/selectArticleByPage', '/article/getArticleCount', '/article/selectArticleByCatalog', '/article/selectNextAndPrevArticle', '/comment/selectCommentsById', '/link/selectLink','/message/addmessage', '/message/selectMessageByPage', '/message/getMessageCount', '/timeline/selectTimeline','/public/img/avatar.jpg']
+const DonotNeedTokenArr = ['/', '/captcha', '/user/login', '/article/selectArticleById', '/article/selectArticleBykeyword', '/article/selectArticleByPage', '/article/getArticleCount', '/article/selectArticleByCatalog', '/article/selectNextAndPrevArticle', '/comment/selectCommentsById', '/link/selectLink','/message/addmessage', '/message/selectMessageByPage', '/message/getMessageCount', '/timeline/selectTimeline','/image/uploadImage','/image/delImgById']
 
 //验证token是否过期并规定哪些路由不用验证
 app.use(expressJwt({
@@ -78,7 +83,6 @@ app.use(bodyParser.urlencoded({
 }))
 // parse application/json
 app.use(bodyParser.json())
-app.use("/public", express.static(path.join(__dirname, "./uploads")))
 
 //设置允许跨域访问该服务.
 app.all('*', function (req, res, next) {
@@ -102,6 +106,7 @@ app.use("/comment", commentRouter)
 app.use("/timeline", timelineRouter)
 app.use("/message", messageRouter)
 app.use("/link", linkRouter)
+app.use("/image", imageRouter)
 
 app.get('/captcha', function (req, res) {
   var codeConfig = {
