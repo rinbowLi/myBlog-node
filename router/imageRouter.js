@@ -1,8 +1,7 @@
 const express = require("express")
-const fs =require("fs")
+const fs = require("fs")
 
 const router = express.Router()
-const imageModel = require("../model/imageModel")
 const multer = require("multer")
 
 let storage = multer.diskStorage({
@@ -37,17 +36,6 @@ let upload = multer({
  * @apiSuccess {String} msg  返回消息.
  */
 router.post("/uploadImage", upload.single("file"), (req, res) => {
-    //数据获取
-    let {
-        articleId,
-    } = req.body;
-
-    if (!articleId) {
-        return res.send({
-            code: -1,
-            msg: "请填写关联文章id"
-        });
-    }
     //'file'指的是file对象的key值
     let {
         size,
@@ -70,26 +58,12 @@ router.post("/uploadImage", upload.single("file"), (req, res) => {
         })
     } else {
         let url = `/public/img/${req.file.filename}`
-        imageModel.insertMany({
-                parentId: articleId,
-                imageUrl: url,
-                createTime: new Date().getTime()
-            })
-            .then(result => {
-                res.send({
-                    code: 0,
-                    msg: "文件上传并保存成功",
-                    url,
-                    id:result._id
-                })
-            })
-            .catch(err => {
-                return res.send({
-                    code: -1,
-                    msg: "系统错误"
-                });
-            })
- 
+        res.send({
+            code: 0,
+            msg: "文件上传并保存成功",
+            url
+        })
+
     }
 
 })
@@ -105,47 +79,38 @@ router.post("/uploadImage", upload.single("file"), (req, res) => {
  * @apiSuccess {Number} code 返回状态码.
  * @apiSuccess {String} msg  返回消息.
  */
-router.post("/delImgById", (req, res) => {
+router.post("/delImgByUrl", (req, res) => {
     //数据获取
     let {
-        id,
         url
     } = req.body;
-    if (!id||!url) {
+    if (!url) {
         return res.send({
             code: -1,
             msg: "请填写图片id和url"
         });
     }
-    //删除数据库图片
-    imageModel.deleteOne({
-            _id: id
-        })
-        .then(result => {
-            //删除图片文件
-            let index = url.lastIndexOf("/");
-            let imgName = url.substr(index + 1);
-            fs.readdirSync('uploads').map((file) => {
-                console.log(file)
-                fs.unlink(`uploads/${file}/${imgName}`,(err) => {
-                  if (err) {
-                    console.log(err);
-                  } else {
-                    return res.send({
-                        code: 0,
-                        msg: "图片删除成功"
-                    });
-                  }
+    //删除图片文件
+    let index = url.lastIndexOf("/");
+    let imgName = url.substr(index + 1);
+    fs.readdirSync('uploads').map((file) => {
+        console.log(file)
+        fs.unlink(`uploads/${file}/${imgName}`, (err) => {
+            if (err) {
+                console.log(err);
+                return res.send({
+                    code: -1,
+                    msg: err
                 });
-              });
-        })
-        .catch(err => {
-            console.log(err)
-            return res.send({
-                code: -1,
-                msg: "系统错误"
-            });
-        })
+            } else {
+                return res.send({
+                    code: 0,
+                    msg: "图片删除成功"
+                });
+            }
+        });
+    });
+
 })
 
 
