@@ -27,6 +27,7 @@ router.post("/addArticle", (req, res) => {
     catalog,
     tags,
     isTop,
+    imgUrl,
     allowComment
   } = req.body;
   if (!title || !content) {
@@ -41,6 +42,7 @@ router.post("/addArticle", (req, res) => {
       catalog,
       time: new Date().getTime(),
       tags,
+      imgUrl,
       isTop,
       allowComment,
       commentCount: 0,
@@ -120,6 +122,7 @@ router.post("/updateArticle", (req, res) => {
     content,
     catalog,
     tags,
+    imgUrl,
     isTop,
     allowComment
   } = req.body;
@@ -141,6 +144,7 @@ router.post("/updateArticle", (req, res) => {
       title,
       content,
       catalog,
+      imgUrl,
       tags,
       isTop,
       allowComment,

@@ -14,6 +14,7 @@ let articleSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  imgUrl:String,    //文章标题图片
   time: Date,
   catalog: String,  //文章分类
   tags:String,       //文章标签
