@@ -4,6 +4,8 @@ const router = express.Router()
 const comments = require("../model/commentsModel")
 const article = require("../model/articleModel")
 
+const mail = require("../utils/mail")
+
 
 /**
  * @api {post} /comments/addcomments 添加评论接口
@@ -50,6 +52,8 @@ router.post("/addComments", (req, res) => {
         }
       }, (err) => {
         if (!err) {
+          //留言成功后给我的邮箱发送一条邮件
+          mail.sendMail("1165973875@qq.com", `${name}给你的文章评论啦！`, `内容是：${content}`);
           return res.send({
             code: 0,
             msg: "评论提交成功"
@@ -203,10 +207,10 @@ router.post("/selectCommentsByPage", (req, res) => {
             code: 0,
             msg: "评论查询成功",
             data: result,
-            total:res1   
+            total: res1
           });
         })
-   
+
     })
     .catch(err => {
       return res.send({

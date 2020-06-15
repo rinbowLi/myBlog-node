@@ -55,7 +55,7 @@ app.use(function (err, req, res, next) {
 
 
 //不需要token验证的接口数组
-const DonotNeedTokenArr = ['/', '/captcha', '/user/login', '/article/selectArticleById', '/article/selectArticleBykeyword', '/article/selectArticleByPage', '/article/getArticleCount', '/article/selectArticleByCatalog', '/article/selectNextAndPrevArticle', '/comment/selectCommentsById', '/link/selectLink','/message/addmessage', '/message/selectMessageByPage', '/message/getMessageCount', '/timeline/selectTimeline','/image/uploadImage','/image/delImgById']
+const DonotNeedTokenArr = ['/', '/captcha', '/user/login', '/article/selectArticleById', '/article/selectArticleBykeyword', '/article/selectArticleByPage', '/article/getArticleCount', '/article/selectArticleByCatalog', '/article/selectNextAndPrevArticle', '/comment/selectCommentsById','/comment/addComments', '/link/selectLink','/message/addmessage', '/message/selectMessageByPage', '/message/getMessageCount', '/timeline/selectTimeline','/image/uploadImage','/image/delImgById']
 
 //验证token是否过期并规定哪些路由不用验证
 app.use(expressJwt({

@@ -3,6 +3,7 @@ const express = require("express")
 const router = express.Router()
 const message = require("../model/messageModel")
 
+const mail = require("../utils/mail")
 
 /**
  * @api {post} /message/addmessage 添加留言接口
@@ -40,6 +41,8 @@ router.post("/addmessage", (req, res) => {
       createTime: new Date().getTime()
     })
     .then(result => {
+      //留言成功后给我的邮箱发送一条邮件
+      mail.sendMail("1165973875@qq.com", `${name}给你的博客留言啦！`, `内容是：${content}`);
       return res.send({
         code: 0,
         msg: "提交留言内容成功"

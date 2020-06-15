@@ -3,9 +3,6 @@ const express = require("express")
 const router = express.Router()
 const article = require("../model/articleModel")
 
-
-let views = {}; //声明全局变量保存访问信息到内存中
-
 /**
  * @api {post} /article/addArticle 添加文章接口
  * @apiName addArticle

@@ -13,14 +13,14 @@ let transporter = nodemailer.createTransport({
   }
 });
 
-function sendMail(mail, subject, code) {
+function sendMail(mail, subject, text) {
   // 发送的对象(邮箱信息)
   let mailObj = {
     from: '<1165973875@qq.com>', // sender address
     to: mail, // list of receivers
     subject: subject, // 邮件标题
     //text和html只能存在一个，不然会冲突，要么纯文本，要么html
-    text: `您的验证码是${code}，有效期为5分钟。`, // plain text body
+    text: text, // plain text body
     //html: "<b>Hello world?</b>" // html body
   };
 
